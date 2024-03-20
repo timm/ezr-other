@@ -1,10 +1,31 @@
-# For starters 101
+# The Basics
 
-## Python
+## Python 
 
-assd sa as as asd asssss
+- Sequences
+  - sets
+    - Removing duplicates
+    - disjunction
+    - Conjunction
+  - Slicing
+  - Dictionary: and, or
+    - Counter
+  - Comprehensions
+    - List
+    - Set
+    - Dictionary
+- Tenary
+- Printing
+  - Secrets of print (sep,end), flush
+  - Fstring
+  - superprint (from the parent)
+- Swap in place
+- Start-up (__name__ == “__main__”)
+- Exception handling
+- Args & Kwargs
+- lambda (closures)
 
-## Maths
+## Just enough statistics
 
 - [entropy](entropy.md)
 - standard deviation
@@ -14,6 +35,12 @@ assd sa as as asd asssss
   - effect size
   - significance
   - ranking (SK)
+
+## Shell
+
+- Regex
+- awk
+- Makefile
 
 # Smarter Scripting
 - little languages (regx, data models headers, __d__2options)
