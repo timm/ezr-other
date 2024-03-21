@@ -12,7 +12,7 @@ OPTIONS:
   -C --Cut    ignore ranges less than C*max   = .1
   -d --d      frist cut                       = 32
   -D --D      second cut                      = 4
-  -f --file   csv data file name              = ../data/diabetes.csv
+  -f --file   csv data file name              = -
   -F --Far    how far to search for faraway?  = .95
   -h --help   show help                       = false
   -H --Half   #items to use in clustering     = 256
@@ -27,6 +27,13 @@ local m={}   -- this module
 local the={} -- contains option=value; built from above help string
 local eg={}  -- for our start-up routines
 local l={}   -- defines some standard library tools
+local NUM=require"num"
+local SYM=require"sym"
+
+function eg.main()
+  for row in csv(the.file) do
+    print(row) end end
+
 ------------------------------------------------------------
 -- ## Lib
 -- From here down, you can probably just copy vertbatim into your next project.
@@ -87,6 +94,8 @@ function eg.all(     bads)
 
 -- show help
 function eg.help() os.exit( print("\n".. help) ) end
+
+function eg.the() print(the) end
 ------------------------------------------------------------
 -- ## Start-up
 
