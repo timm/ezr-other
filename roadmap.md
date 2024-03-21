@@ -61,7 +61,7 @@
     - shut the heck up (quiet execution)
     - standard files STDIN, STDERR, STROUT
   - seed control
-- automate everything (makefile)
+- automate everything (makefile: insert awkward stuff there)
 - test engine
   - setup,
     - reset
