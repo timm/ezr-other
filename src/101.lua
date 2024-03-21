@@ -24,23 +24,23 @@ OPTIONS:
 -- ## Variables
 
 local m={}   -- this module
-local b4={}; for k, _ in pairs(_ENV) do b4[k]=k end -- used to find bad globals
 local the={} -- contains option=value; built from above help string
 local eg={}  -- for our start-up routines
 local l={}   -- defines some standard library tools
-------------------------------------------------------------
+------------------------------------------------------------
 -- ## Lib
+-- From here down, you can probably just copy vertbatim into your next project.
 
 -- Return keys, sorted.
 function l.keys(t,    u)
   u={}; for k,_ in pairs(t) do u[1+#u]=k end; table.sort(u); return u end
 
 -- Prune leading and trailing blanks
-function l.trim(s) return s1:match"^%s*(%S+)" end
-
+function l.trim(s) return s:match"^%s*(%S+)" end
 
 -- Coerce a string to some thing.
-function l.is(s) 
+function l.coerce(s)
+  s = l.trim(s)
   return math.tointeger(s) or tonumber(s) or s=="true" or (s~="false" and s) end
 
 -- Return rows of a csv file.
@@ -49,51 +49,52 @@ function l.csv(src)
   return function(      s,t)
     s=io.read()
     if   s 
-    then t={}; for s1 in s:gmatch("([^,]+)") do t[1+#t]=l.is(l.trim(s1)) end; return t 
+    then t={}; for s1 in s:gmatch("([^,]+)") do t[1+#t]=l.coerce(s1) end; return t
     else io.close(src) end end end
 
--- Update table from CLI. Non-booleans need values but for booleans, we just flip the default.
+-- Update table from CLI. Non-booleans need values but booleans just flip defaults.
 function l.cli(t)
   for k, v in pairs(t) do
     v = tostring(v)
     for argv,s in pairs(arg) do
       if s=="-"..(k:sub(1,1)) or s=="--"..k then
         v = v=="true" and "false" or v=="false" and "true" or arg[argv + 1]
-        t[k] = l.coerce(l.trim(v)) end end end
-  if t.help then os.exit(print("\n"..help)) end 
+        t[k] = l.coerce(v) end end end 
+  if t.help then eg.help() end
   return t end
 
-function l.reset(fun,     old)
-   old={}; for k,v in pairs(the) do old[k]=v end
-   math.randomseed(the.seed or 1234567890) -- set up
-   status = fun()
-   for k,v in pairs(old) do the[k]=v end -- tear down
-   return status end
+-- Run `fun`, ensuring the config is set to defaults before and after.
+function l.reset(fun,     old,status)
+  old={}; for k,v in pairs(the) do old[k]=v end
+  math.randomseed(the.seed or 1234567890) -- set up
+  status = fun()
+  for k,v in pairs(old) do the[k]=v end -- tear down
+  return status end
 
-function l.run(k)
-  return l.reset(function ()
-    if eg[k] and eg[k]()==false then
-      io.stderr:write(l.fmt("# !!!!!!!! FAIL [%s]\n",k)) 
-      return True end end) end
+-- Return true if, when we run an example `eg1`, it reports failure (returns `false`). 
+function l.stagger( eg1 ) 
+  if not eg[ eg1 ] or l.reset( eg[ eg1 ] )==false then
+    io.stderr:write(l.fmt("# !!!!!!!! FAIL [%s]\n", eg1 ))
+    return true end end
 
 -- Run all examples
 function eg.all(     bads)
   bads=0
-  for _,k in pairs(l.keys(eg)) do 
-    if k ~= "all" then 
-      if run(k) then bads=bads+1 end end end
+  for _,k in pairs(l.keys(eg)) do
+    if k ~= "all" and l.stagger(k) then bads = bads + 1 end end
   if bads>0 then io.stderr:write(l.fmt("# !!!!!!!! FAIL(s): %s\n",bads)) end
   os.exit(bads) end
+
+-- show help
+function eg.help() os.exit( print("\n".. help) ) end
 ------------------------------------------------------------
 -- ## Start-up
 
 -- Build `the` from `help`.
-for k, s1 in help:gmatch("[-][-]([%S]+)[^=]+= ([%S]+)") do the[k] = l.is(s1) end
+for k,s1 in help:gmatch("[-][-]([%S]+)[^=]+=[%s]*([%S]+)") do the[k] = l.coerce(s1) end
 
 -- If we are in the driver's seat, then update `the` from command line and run something.
-if not pcall(debug.getlocal, 4, 1) then 
-   l.run(l.cli(the).todo) end
-   for k,v in pairs(_ENV) do  
-     if not b4[k] then print("E: bad global?",k,type(k)) end end
+if not pcall(debug.getlocal, 4, 1) then
+   l.stagger(l.cli(the).todo) end
 
 return m
