@@ -18,3 +18,8 @@ docs:
  
 name:
 	read -p "word> " w; figlet -f mini -W $$w  | gawk '$$0 {print "#        "$$0}' |pbcopy
+
+~/tmp/%.html : %.lua
+	pycco -d ~/tmp $^
+	echo 'p {text-align:right;}' >> ~/tmp/pycco.css
+	

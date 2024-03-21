@@ -47,12 +47,27 @@
 
 ## scripting
 
+- script101
+  - DRY, not WET
+  - documentation
+  - exposed control parameters
+  - test suite
+  - piping
+    - shut the heck up (quiet execution)
+    - standard files STDIN, STDERR, STROUT
+  - seed control
 - automate everything (makefile)
 - test engine
+  - setup,
+    - reset
+  - tear down
+  - $?
 - documentation (docstrings)
   - tuning
 - decomposition (pipes, stdio)
 - less is more (technical debt, my DATA model)
+- precommit hooks
+  - e.g. badging
 
 # Easier AI
 
