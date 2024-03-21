@@ -24,6 +24,7 @@
 - Exception handling
 - Args & Kwargs
 - lambda (closures)
+- toto: compelte this from ase24/docs/ninjas
 
 ## Just enough statistics
 
