@@ -56,7 +56,7 @@ function l.main(the,eg,help,     bads)
   if the.help then os.exit(print(help)) end
   bads = 0
   for _,k in pairs(l.keys(eg)) do
-    if (the.todo == k or the.todo=="all") and l.reset(the, eg[ k ] )==false then
+    if (the.todo == k or the.todo=="all") and l.reset(the, eg[k])==false then
       io.stderr:write(l.fmt("# !!!!!!!! FAIL [%s]\n", k ))
       bads = bads+1 end end
   if bads>0 and the.todo=="all" then 
