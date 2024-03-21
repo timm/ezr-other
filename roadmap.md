@@ -44,12 +44,16 @@
 
 # Smarter Scripting
 - little languages (regx, data models headers, __d__2options)
+- DRY, not WET
+- licensing
+- packaging
+- information hiding
+  - API https://www.hyrumslaw.com/ (you get one chance to write an API)
 
 ## scripting
 
 - script101
-  - DRY, not WET
-  - documentation
+    - documentation
   - exposed control parameters
   - test suite
   - piping

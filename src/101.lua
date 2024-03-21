@@ -23,17 +23,13 @@ OPTIONS:
 -------------------------------------------------------------
 -- ## Variables
 
-local m={}  -- this module
+local m={}   -- this module
 local b4={}; for k, _ in pairs(_ENV) do b4[k]=k end -- used to find bad globals
 local the={} -- contains option=value; built from above help string
-local eg={} -- for our start-up routines
-local l={}  -- defines some standard library tools
+local eg={}  -- for our start-up routines
+local l={}   -- defines some standard library tools
 ------------------------------------------------------------
 -- ## Lib
-
--- Rebuild from help
-function l.reset(s)
-  math.randomseed(the.seed or 1234567891) end
 
 -- Return keys, sorted.
 function l.keys(t,    u)
@@ -67,14 +63,18 @@ function l.cli(t)
   if t.help then os.exit(print("\n"..help)) end 
   return t end
 
-function l.run(k,     bad,old)
-  if eg[k] then 
-    old={}; for k,v in pairs(the) do old[k]=v end
-    math.randomseed(the.seed or 1234567890) -- set up
-    bad = eg[k]()==false
-    if bad then io.stderr:write(l.fmt("# !!!!!!!! FAIL [%s]\n",k)) end
-    for k,v in pairs(old) do the[k]=v end -- tear down
-    return bad end end 
+function l.reset(fun,     old)
+   old={}; for k,v in pairs(the) do old[k]=v end
+   math.randomseed(the.seed or 1234567890) -- set up
+   status = fun()
+   for k,v in pairs(old) do the[k]=v end -- tear down
+   return status end
+
+function l.run(k)
+  return l.reset(function ()
+    if eg[k] and eg[k]()==false then
+      io.stderr:write(l.fmt("# !!!!!!!! FAIL [%s]\n",k)) 
+      return True end end) end
 
 -- Run all examples
 function eg.all(     bads)
@@ -83,7 +83,7 @@ function eg.all(     bads)
     if k ~= "all" then 
       if run(k) then bads=bads+1 end end end
   if bads>0 then io.stderr:write(l.fmt("# !!!!!!!! FAIL(s): %s\n",bads)) end
-  os.exit(bad) end
+  os.exit(bads) end
 ------------------------------------------------------------
 -- ## Start-up
 
@@ -92,7 +92,7 @@ for k, s1 in help:gmatch("[-][-]([%S]+)[^=]+= ([%S]+)") do the[k] = l.is(s1) end
 
 -- If we are in the driver's seat, then update `the` from command line and run something.
 if not pcall(debug.getlocal, 4, 1) then 
-   run(l.cli(the).todo) end
+   l.run(l.cli(the).todo) end
    for k,v in pairs(_ENV) do  
      if not b4[k] then print("E: bad global?",k,type(k)) end end
 
