@@ -1,7 +1,14 @@
-local l = require "lib"
 local stats = require "stats"
 local NUM = {}
 
+-- asdaasddas
+
+function NUM:new(s, n)
+  return {txt=s or " ", at=n or 0, n=0,
+          mu=0, m2=0, sd=0, hi=-1E30, lo=1E30,
+          heaven= (s or ""):find"-$" and 0 or 1} end
+
+-- asdaas
 function NUM:add(x,     d)
   if x ~="?" then
     self.n  = self.n+1
