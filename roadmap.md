@@ -1,6 +1,8 @@
-# The Basics
+# smarter
 
-## Python 
+## The Basics
+
+### Python
 
 - Sequences
   - sets
@@ -14,54 +16,57 @@
     - List
     - Set
     - Dictionary
-- Tenary
+- Ternary
 - Printing
   - Secrets of print (sep,end), flush
   - Fstring
-  - superprint (from the parent)
+  - super print (from the parent)
 - Swap in place
 - Start-up (__name__ == “__main__”)
 - Exception handling
 - Args & Kwargs
 - lambda (closures)
-- toto: compelte this from ase24/docs/ninjas
+- toto: complete this from ase24/docs/ninjas
 
-## Just enough statistics
+### Just enough statistics
 
-- [entropy](entropy.md)
-- standard deviation
-  - incremental
-  - non-parametric
-- stats
+- normal
+  - incremental update
+- triangular
+- cdf
+- [entropy](entropy.md) 
+- discretization (simple) recall doherty icml'95
+- difference
   - effect size
   - significance
   - ranking (SK)
 
-## Shell
+### Shell
 
 - Regex
 - awk
 - Makefile
 
-# Smarter Scripting
+## Smarter Scripting
+
 - little languages (regx, data models headers, __d__2options)
 - DRY, not WET
 - licensing
 - packaging
 - information hiding
-  - API https://www.hyrumslaw.com/ (you get one chance to write an API)
+  - [API](https://www.hyrumslaw.com/) (you get one chance to write an API)
 
-## scripting
+### scripting
 
 - script101
-    - documentation
+  - documentation
   - exposed control parameters
   - test suite
   - source control
-    - config in soruce control. eg. my fav tmus start up
+    - config in source control. eg. my fav tmus start up
   - piping
     - shut the heck up (quiet execution)
-    - standard files STDIN, STDERR, STROUT
+    - standard files STDIN, STDERR, STDOUT
   - seed control
 - automate everything (makefile: insert awkward stuff there)
 - test engine
@@ -74,37 +79,42 @@
   - tuning
 - decomposition (pipes, stdio)
 - less is more (technical debt, my DATA model)
-- precommit hooks
+- pre-commit hooks
   - e.g. badging
 
-# Easier AI
+## Easier AI
 
 - active learning (one thing per leaf)
 Data
 
-classifier
+classifier:
+
 - Naive bayes
 - knn (no clustering) <== can be regressions as well
 - decision tree
 
-clustering
+clustering:
+
 - one sample per leaf (tiny training)
-- regression and classifiication
-- sample plus propergate
+- regression and classification
+- sample plus propagate
 
 - lessons:
   - data reduction (just one sample per leaf)
   - when recursively clustering, use less and less to find poles.
 
-#KE
+## KE
+
 W1: data.
-  -   Little languages: data headers (bigger: regular expressions)
+
+- Little languages: data headers (bigger: regular expressions)
 - Test suite
 - documentation
 - Pipe and filter/ architecture
 
 W2: classification
-- Bayes, 
+
+- Bayes
 - Labelling
 
-# Read More
+## Read More
