@@ -22,6 +22,16 @@ function lib.trim(s) return s:match"^%s*(%S+)" end
 -- Return keys, sorted.
 function lib.keys(t,    u)
   u={}; for k,_ in pairs(t) do u[1+#u]=k end; table.sort(u); return u end
+
+-- Effort required to recreate the signal in `t`.
+function lib.entropy(t,       e,n)
+  n=0; for _,v in pairs(t) do n = n+v end
+  e=0; for _,v in pairs(t) do if v > 0 then e = e-v/n * math.log(v/n,2) end end
+  return e,n end
+
+-- Effort required to recreate the signal in `t`.
+function lib.mode(t,        x,n)
+  n=0; for k,n1 in pairs(t) do if n1>n then x,b = k,n1 end end; return x end
 -------------------------------------------------------------------------------
 -- ## Coerce Strings to things
 

@@ -1,5 +1,5 @@
-local m,eg,the,l = {},{},{},require"lib" -- standard first line
-local help = [[
+local l = require"lib" -- standard first line
+local eg,the,help = {},{},[[
 mylo: recursive bi-clustering via random projections (lo is less. less is more. go lo)
 (c) 2023, Tim Menzies, BSD-2
 
@@ -33,4 +33,5 @@ function eg.main()
 -------------------------------------------------------------
 the = l.settings(help)
 if l.isMain() then l.main(the,eg,help) end
-return m
+
+return {the=the,help=help}
