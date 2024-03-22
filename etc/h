@@ -1,0 +1,7 @@
+EZR="$(dirname $(cd $( dirname "${BASH_SOURCE[0]}" ) && pwd ))"
+
+
+alias bash="bash --init-file $EZR/etc/bashrc -i"
+export BASH_SILENCE_DEPRECATION_WARNING=1 
+
+ 

@@ -57,6 +57,8 @@
     - documentation
   - exposed control parameters
   - test suite
+  - source control
+    - config in soruce control. eg. my fav tmus start up
   - piping
     - shut the heck up (quiet execution)
     - standard files STDIN, STDERR, STROUT
@@ -67,6 +69,7 @@
     - reset
   - tear down
   - $?
+  - static code analysis (language server protocol)
 - documentation (docstrings)
   - tuning
 - decomposition (pipes, stdio)
