@@ -1,5 +1,17 @@
 local lib={}
 -------------------------------------------------------------------------------
+-- ## Objects
+
+function lib.o(_) return "(22" end
+
+function lib.obj(s,    t)
+  t = {_name=s}
+  t.__index = t
+  t.__tostring=function(...) return lib.o(...) end                    
+  return setmetatable(t, { __call=function(_,...)
+    local i = setmetatable({},t)
+    return setmetatable(t.new(i,...) or i,t) end}) end
+
 -- ## Strings
 
 -- Prune leading and trailing blanks
