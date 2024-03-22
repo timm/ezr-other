@@ -11,10 +11,6 @@ saved         : ## save and push to main branch
 		read -p "commit msg> " x; y=$${x:-saved}; git commit -am "$$y}"; git push;  git status; echo "$$y, saved!"
 	 
 
-FILES=$(wildcard *.py)
-docs: 
-		echo "docs..."
-		$(MAKE) -B $(addprefix ~/tmp/, $(FILES:.py=.pdf))  $(addprefix ../docs/, $(FILES:.py=.html))
  
 name:
 		read -p "word> " w; figlet -f mini -W $$w  | gawk '$$0 {print "#        "$$0}' |pbcopy
@@ -40,3 +36,12 @@ name:
 			-o ~/tmp/$^.ps $^ ;               \
 		ps2pdf ~/tmp/$^.ps $@ ;  rm ~/tmp/$^.ps; \
 	  open $@
+
+
+PY=$(wildcard *.py)  
+LUA=$(wildcard *.lua)
+docs: 
+		echo "docs..."
+		mkdir -p ~/tmp
+		$(MAKE) -B $(addprefix ~/tmp/, $(PY:.py=.pdf))  $(addprefix ~/tmp/, $(PY:.py=.html))
+		$(MAKE) -B $(addprefix ~/tmp/, $(LUA:.lua=.pdf))  $(addprefix ~/tmp/, $(LUA:.lua=.html)
