@@ -64,6 +64,8 @@ function lib.cli(t)
       if s=="-"..(k:sub(1,1)) or s=="--"..k then
         v = v=="true" and "false" or v=="false" and "true" or arg[argv + 1]
         t[k] = lib.coerce(v) end end end end
+
+
 -------------------------------------------------------------------------------
 -- ## Main functions
 

@@ -25,12 +25,6 @@ function SYM:div() return l.entropy(self.has) end
 function SYM:like(x,prior,m,_)
   return ((self.has[x] or 0) + m*prior)/(self.n + m) end
 
--- Return a merge if (10 parts are too rare or (2) merge is not more disorderd. 
-function SYM.merged(i,j,enough,    k) 
-  k = SYM(i.txt,i.at)
-  for _,sym in pairs{i,j} do
-    for x,n in pairs(sym) do k:add(x,n) end end
-  if i.n < (enough or 0) or j.n < (enough or 0) then return k end -- (1)
-  if k:div() <= (i.n*i:div() + j.n*j:div())/k.n then return k end end -- (2)
+
 
 return SYM
