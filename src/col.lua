@@ -1,8 +1,8 @@
 -- Things that are true for NUMs and SYMs
 
 local col={}
--- Return a merge if (1) parts are well supported rare or (2) merge is not more disorderd. 
 
+-- Return a merge if (1) parts are well supported rare or (2) merge is not more disorderd. 
 function col.merged(i,j,support,    k) 
   k = getmetatable(i)(i.txt,i.at)
   for _,thing in pairs{i,j} do
