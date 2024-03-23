@@ -2,8 +2,6 @@ local lib={}
 -------------------------------------------------------------------------------
 -- ## Objects
 
-function lib.o(_) return "(22" end
-
 function lib.obj(s,    t)
   t = {_name=s}
   t.__index = t
@@ -11,11 +9,36 @@ function lib.obj(s,    t)
   return setmetatable(t, { __call=function(_,...)
     local i = setmetatable({},t)
     return setmetatable(t.new(i,...) or i,t) end}) end
+-------------------------------------------------------------------------------
+-- ## Numbers
 
+-- Return number `n`, rounded to `ndec`imals.
+function lib.rnd(n, ndecs)
+  if type(n) ~= "number" then return n end
+  if math.floor(n) == n  then return n end
+  local mult = 10^(ndecs or 2)
+  return math.floor(n * mult + 0.5) / mult end
+-------------------------------------------------------------------------------
 -- ## Strings
 
 -- Prune leading and trailing blanks
 function lib.trim(s) return s:match"^%s*(%S+)" end
+
+-- Emulate sprintf
+lib.fmt = string.format
+
+-- Print a string of a nested structure.
+function lib.oo(x) print(lib.o(x)); return x end
+
+-- Rerun a string for a nested structure.
+function lib.o(t,  n,      u)
+  if type(t) == "number" then return tostring(lib.rnd(t, n)) end
+  if type(t) ~= "table"  then return tostring(t) end
+  u = {}
+  for _,k in pairs(lib.keys(t)) do
+    if tostring(k):sub(1,1) ~= "_" then
+      u[1+#u]= #t>0 and lib.o(t[k],n) or lib.fmt("%s: %s", k, lib.o(t[k],n)) end end
+  return (t._name or "").."{" .. table.concat(u, ", ") .. "}" end
 -------------------------------------------------------------------------------
 -- ## Tables
 
@@ -87,7 +110,6 @@ function lib.sandbox(the,fun,     old,status)
   status = fun()
   for k,v in pairs(old) do the[k]=v end -- tear down
   return status end
-
 -------------------------------------------------------------------------------
 -- Return this module.
 
