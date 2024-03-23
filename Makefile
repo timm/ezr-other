@@ -43,5 +43,5 @@ LUA=$(wildcard *.lua)
 docs: 
 		echo "docs..."
 		mkdir -p ~/tmp
-		$(MAKE) -B $(addprefix ~/tmp/, $(PY:.py=.pdf))  $(addprefix ~/tmp/, $(PY:.py=.html))
-		$(MAKE) -B $(addprefix ~/tmp/, $(LUA:.lua=.pdf))  $(addprefix ~/tmp/, $(LUA:.lua=.html)
+		$(MAKE) -B $(addprefix ~/tmp/, $(PY:.py=.pdf))    $(addprefix ~/tmp/, $(PY:.py=.html))
+		$(MAKE) -B $(addprefix ~/tmp/, $(LUA:.lua=.pdf))  $(addprefix ~/tmp/, $(LUA:.lua=.html))

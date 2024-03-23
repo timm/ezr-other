@@ -1,7 +1,6 @@
 local lib={}
 -------------------------------------------------------------------------------
 -- ## Objects
-
 function lib.obj(s,    t)
   t = {_name=s}
   t.__index = t
@@ -39,12 +38,44 @@ function lib.o(t,  n,      u)
     if tostring(k):sub(1,1) ~= "_" then
       u[1+#u]= #t>0 and lib.o(t[k],n) or lib.fmt("%s: %s", k, lib.o(t[k],n)) end end
   return (t._name or "").."{" .. table.concat(u, ", ") .. "}" end
+
+-- Return a string for a nested structure.
+function lib.o(t,  n,      u)
+  if type(t) == "number" then return tostring(lib.rnd(t, n)) end
+  if type(t) ~= "table"  then return tostring(t) end
+  u={}
+  for _,k in pairs(lib.keys(t)) do
+    if tostring(k):sub(1,1) ~= "_" then
+      u[1+#u]= #t>0 and lib.o(t[k],n) or lib.fmt("%s: %s",k,lib.o(t[k],n)) end end
+  return "{" .. table.concat(u, ", ") .. "}" end
 -------------------------------------------------------------------------------
 -- ## Tables
 
 -- Return keys, sorted.
 function lib.keys(t,    u)
   u={}; for k,_ in pairs(t) do u[1+#u]=k end; table.sort(u); return u end
+
+-- Return a new table, with old items sorted randomly.
+function lib.shuffle(t,    u,j)
+  u={}; for _,x in pairs(t) do u[1+#u]=x; end;
+  for i = #u,2,-1 do j=math.random(i); u[i],u[j] = u[j],u[i] end
+  return u end
+
+-- Return `t` skipping `go` to `stop` in steps of `inc`.
+function lib.slice(t, go, stop, inc,    u) 
+  if go   and go   < 0 then go=#t+go     end
+  if stop and stop < 0 then stop=#t+stop end
+  u={}
+  for j=(go or 1)//1,(stop or #t)//1,(inc or 1)//1 do u[1+#u]=t[j] end
+  return u end
+
+-- Schwartzian transform:  (1) decorate, (2) sort, (3) undecorate
+function lib.keysort(t,fun,      u,v)
+  u={}
+  for _,x in pairs(t) do u[1+#u]={x=x, y=fun(x)} end -- (1) decorate
+  table.sort(u, function(a,b) return a.y < b.y end)  -- (2) sort
+  v={}; for _,xy in pairs(u) do v[1+#v] = xy.x end   -- (3) undecoreate
+  return v end
 -------------------------------------------------------------------------------
 -- ## Coerce Strings to things
 
