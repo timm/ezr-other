@@ -46,6 +46,8 @@
 - Regex
 - awk
 - Makefile
+- shebang
+- pipes
 
 ## Smarter Scripting
 

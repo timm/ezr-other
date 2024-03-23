@@ -4,7 +4,7 @@ local DATA=l.obj "DATA"
 function DATA:new(src,  fun,order)
   self.rows={}
   if type(src) == "string"
-  then for   t in lib.csv(src)     do self:add(t, fun) end
+  then for   t in l.csv(src)     do self:add(t, fun) end
   else for _,t in pairs(src or {}) do self:add(t, fun) end end
   if order then self:sort() end
   return self end
@@ -14,7 +14,7 @@ function DATA:add(t,  fun)
   if   self.cols
   then if fun then fun(self,t) end
        self.rows[1 + #self.rows] = self.cols:add(t)
-  else self.cols = COLS(row) end end
+  else self.cols = COLS(t) end end
 
 -- Sort-in-place the rows by distance to heaven.
 function DATA:sort()
