@@ -1,14 +1,14 @@
-func hist(a,  w,f,nump,    order,k) {
+function hist(a,  w,f,nump,    order,k) {
   order = nump ? "sort -n" : "sort" 
   f     = f    ? f         : 1
   for(k in a)
     print(sprintf("%"(w?w:4)"s | %s", k,rep(int(a[k]/f),"*"))) | order }
 
-func rep(n,c,    s) {
+function rep(n,c,    s) {
   while(--n > 0) s = s c 
   return s }  
 
-func eg_host(    a,b) {
+function eg_host(    a,b) {
   a["apple"]= 10
   a["juice"]= 20
   a["fred"]=  30
