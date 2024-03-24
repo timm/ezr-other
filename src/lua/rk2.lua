@@ -10,6 +10,7 @@ Options
   -F --Far      if polarizing, ignore  outliners = 0.95
   -H --Halves   if polarizing, use a subset      = 64
   -l --leaf     whenrecursing, stop at n^leaf    = 0.5
+  -L --lhs      tree print left hand side        = 35
   -p --p        distance coeffecient             = 2 
   -s --seed     rand seed                        = 1234567891
   -t --todo     start-up action                  = nothing ]]
@@ -180,12 +181,23 @@ function DATA:halves(rows,lvl,     node,lefts,rights)
   rows  = rows or self.rows 
   node = {here=self:clone(rows)}
   if    #rows > 2*(#self.rows)^the.leaf
-  then  lefts,rights = self:halve(rows) 
-        print( (('|.. '):rep(lvl)..(#rows)) )
-        node.left  = #lefts  < #rows and self:halves(lefts,lvl+1)
-        node.right = #rights < #rows and self:halves(rights,lvl+1)
-  else  print( (('|.. '):rep(lvl)..(#rows)),":", l.o(node.here:mid()))
-  return node end end
+  then  lefts,rights = self:halve(rows)
+        node.lefts  = #lefts  < #rows and self:halves(lefts,lvl+1)
+        node.rights = #rights < #rows and self:halves(rights,lvl+1) end
+  return node end
+
+function DATA:visit(node,fun,      lvl)
+  lvl = lvl or 0
+  if node then
+    fun(self, node.here, lvl, node.lefts, node.rights)
+    for _,kid in pairs{node.lefts, node.rights} do
+      self:visit(kid, fun, lvl+1) end end end
+
+function DATA:show(here,lvl,lefts,rights,     leaf)
+  right = (lefts or rights) and "" or " : "..l.o(here:mid())
+  left  = ('|.. '):rep(lvl)..#(here.rows)
+  print(string.format("%-" .. the.lhs .. "s %s", left, right))end 
+
 -------------------------------------------------------------------------------
 -- ## Misc library functions
 -- ### Objects
@@ -203,7 +215,7 @@ function l.isa(x,y) return setmetatable(y,x) end
 function l.push(t,x) t[1+#t] = x; return x end
 
 -- Return any one item from `t`.
-function l.any(t) return a[math.random(#t)] end
+function l.any(t) return t[math.random(#t)] end
 
 -- Return any `n` items from `t`.
 function l.many(t,n,   u)
@@ -302,8 +314,10 @@ function eg.sort(    d,rows)
   for i=1,10    do print(i..",",l.o(rows[i])) end
   for i=370,380 do print(i..",",l.o(rows[i])) end end
 
-function eg.halves(  d)
-  DATA.new(l.csv(the.file)):halves() end
+function eg.halves(       d, tree)
+  d= DATA.new(l.csv(the.file))
+  tree=d:halves()
+  d:visit(tree,DATA.show) end
 -----------------------------------------
 -- ## Start up. 
 
