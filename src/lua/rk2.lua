@@ -9,7 +9,7 @@ Options
   -f --file     data file                        = ../../data/auto93.csv
   -F --Far      if polarizing, ignore  outliners = 0.95
   -H --Halves   if polarizing, use a subset      = 64
-  -l --leaf     whenrecursing, stop at n^leaf    = 0.5
+  -l --leaf     when recursing, stop at n^leaf   = 0.5
   -L --lhs      tree print left hand side        = 35
   -p --p        distance coeffecient             = 2 
   -s --seed     rand seed                        = 1234567891
@@ -189,14 +189,14 @@ function DATA:halves(rows,lvl,     node,lefts,rights)
 function DATA:visit(node,fun,      lvl)
   lvl = lvl or 0
   if node then
-    fun(self, node.here, lvl, node.lefts, node.rights)
+    fun(self,node,lvl)
     for _,kid in pairs{node.lefts, node.rights} do
       self:visit(kid, fun, lvl+1) end end end
 
-function DATA:show(here,lvl,lefts,rights,     leaf)
-  right = (lefts or rights) and "" or " : "..l.o(here:mid())
-  left  = ('|.. '):rep(lvl)..#(here.rows)
-  print(string.format("%-" .. the.lhs .. "s %s", left, right))end 
+function DATA:show(it,lvl,      right,left)
+  right = (it.lefts or it.rights) and "" or " : "..l.o(it.here:mid())
+  left  = ('|.. '):rep(lvl)..#(it.here.rows)
+  print(string.format("%-" .. the.lhs .. "s %s", left, right)) end 
 
 -------------------------------------------------------------------------------
 -- ## Misc library functions
