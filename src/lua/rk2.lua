@@ -17,7 +17,7 @@ function NUM.new(s, n) return isa(NUM, {n=0, txt=s, at=n, mu=0, lo=1E30, hi=-1E3
 function NUM:add(x,    d) 
   if x~="?" then
     self.n  = self.n + 1 
-    self.lo = math.max(x, self.lo)
+    self.lo = math.min(x, self.lo)
     self.hi = math.max(x, self.hi) 
     d       = x - self.mu
     self.mu = self.mu + d/self.n end end
@@ -48,7 +48,8 @@ function SYM:mid(    n,mode)
   n=0; for k,v in pairs(self.has) do if v>n then mode,n=v,n end end; return mode end
 
 function SYM:div(     e)
-  e=0; for _,v in pairs(self.has) do e=e + v/self.n*math.log(v/self.n,2) end; return -e end
+  e=0; for _,v in pairs(self.has) do e=e + v/self.n*math.log(v/self.n,2) end
+  return -e end
 
 function SYM:dist(x,y)
   return x=="?" and y=="?" and 1 or (x==y and 0 or 1) end
@@ -103,22 +104,17 @@ function DATA:around(row1,  rows)
   return l.keysort(rows or self.rows,
                    function(row2) return self:dist(row1,row2) end) end
 
-function DATA:polarize(rows,      a,b,d)
+function DATA:polarize(rows,      a,b,far)
   rows = rows or self.rows
-  d=-1
-  for i=1,30 do
-    local a0,b0 = l.any(rows), l.any(rows)
-    local d0 = self:dist(a0,b0)
-    print(d0)
-    if d0 ~= 0 and d0 > d then a,b,d = a0,b0,d0 end end
-  print("::",a,b)
-  print("::",l.o(a),l.o(b))
+  far = (#rows * the.Far)//1
+  a = self:around(l.any(rows),rows)[far]
+  b = self:around(a,rows)[far]
   return a,b end
 
 function DATA:halve(rows,      left,right,lefts,rights)
   left, right = self:polarize(rows)
   lefts,rights = {},{}
-  for _,t in pairs(rows) do
+  for _,t in pairs(rows) dow
     l.push(self:dist(t,left) < self:dist(t,right) and lefts or rights, t) end
   return lefts, rights end
 
@@ -126,6 +122,7 @@ function DATA:k2means(rows,lvl,     node,lefts,rights)
   lvl = lvl or 0
   rows  = rows or self.rows 
   node = {here=self:clone(rows)}
+  print( (('|.. '):rep(lvl)..(#rows)))
   if   #rows > 2*(#self.rows)^the.leaf
   then lefts,rights = self:halve(rows) 
        node.left  = #lefts < #rows and self:k2means(lefts,lvl+1)
@@ -197,14 +194,7 @@ function eg.clone(     d)
 
 function eg.dists(    d,a,b,ab)
   d = DATA.new(l.csv(the.file))
-  for i=1,20 do
-    print""
-    a= l.any(d.rows)
-    b= l.any(d.rows)
-    ab= d:dist(a,b)
-    print(l.o(a))
-    print(l.o(b))
-    print(ab) end end
+  for _,row in pairs(d.rows) do io.write(l.rnd(d:dist(row, d.rows[1]),3)," ") end end
 
 function eg.sort(    d,rows)
   d = DATA.new(l.csv(the.file))
