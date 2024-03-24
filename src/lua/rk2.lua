@@ -141,7 +141,7 @@ function DATA:polarize(rows,      east,west,far)
   west = self:neighbors(east,rows)[far]
   return east,west,self:dist(east,west) end
 
--- Divides data on distance to two distant points
+-- Divides rows by their distance to two distant points.
 function DATA:halve(rows,      east,_,easts,wests,c)
   east, _,c = self:polarize(l.many(rows, the.Halves))
   easts,wests = {},{}
@@ -149,7 +149,7 @@ function DATA:halve(rows,      east,_,easts,wests,c)
     l.push(self:dist(t,east) <= c/2 and easts or wests, t) end
   return easts, wests end
 
--- Recursive divides data on two distant points.
+-- Recursive bi-cluster the data. 
 function DATA:halves(rows,lvl,     node,lefts,rights)
   lvl = lvl or 0
   rows  = rows or self.rows 
@@ -196,7 +196,7 @@ function l.csv(src)
   src = src=="-" and io.stdin or io.input(src)
   return function(      s,t)
     s=io.read()
-    if   s 
+    if   s
     then t={}; for s1 in s:gsub("%s+", ""):gmatch("([^,]+)") do t[1+#t]=l.coerce(s1) end
          return t
     else io.close(src) end end end
@@ -240,14 +240,14 @@ function eg.sort(    d,rows)
   for i=1,10    do print(i..",",l.o(rows[i])) end
   for i=370,380 do print(i..",",l.o(rows[i])) end end
 
-function eg.k2means(  d)
-  DATA.new(l.csv(the.file)):k2means() end
+function eg.halves(  d)
+  DATA.new(l.csv(the.file)):halves() end
 -----------------------------------------
 -- Start up. 
 
 -- Parse out help to make `the`.   
-for k, s1 in s:gmatch("[-][-]([%S]+)[^=]+=[%s]+([%S]+)") do 
-  the[k] = l.coerce(s1) end
+for k, s in help:gmatch("[-][-]([%S]+)[^=]+=[%s]+([%S]+)") do 
+  the[k] = l.coerce(s) end
 
 -- Update `the` from command line.     
 -- Seed seed from `the`.
