@@ -9,8 +9,10 @@ Options
   -f --file     data file                        = ../../data/auto93.csv
   -F --Far      if polarizing, ignore  outliners = 0.95
   -H --Halves   if polarizing, use a subset      = 128
+  -k --k        bayes                            = 2
   -l --leaf     when recursing, stop at n^leaf   = 0.5
   -L --lhs      tree print left hand side        = 35
+  -m --m         bayes                           = 1
   -p --p        distance coeffecient             = 2 
   -s --seed     rand seed                        = 1234567891
   -t --todo     start-up action                  = nothing ]]
@@ -25,7 +27,7 @@ function NUM.new(  s,n)
   return l.isa(NUM, {n=0, txt=s, at=n, mu=0, lo=1E30, hi=-1E30,
                      heaven= (s or ""):find"-$" and 0 or 1}) end
 
--- update
+-- Update
 function NUM:add(x,    d) 
   if x~="?" then
     self.n  = self.n + 1 
@@ -34,6 +36,7 @@ function NUM:add(x,    d)
     d       = x - self.mu
     self.mu = self.mu + d/self.n end end
 
+-- Marge two NUMs
 function NUM.merge(i,j,    new)
   new    = NUM.new(i.txt,i.s)
   new.n  = i.n + j.n
@@ -43,8 +46,9 @@ function NUM.merge(i,j,    new)
   return new end
 
 -- Stats.
-function NUM:mid() return self.mu end
-function NUM:div() return (self.hi - self.lo) / 2.56 end
+function NUM:mid()       return self.mu end
+function NUM:div()       return (self.hi - self.lo) / 2.56 end
+function NUM:like(x, ...) return l.cdfTriangular(x, self.lo, self.mu, self.hi) end
 
 -- Distance.
 function NUM:dist(x,y)
@@ -55,8 +59,7 @@ function NUM:dist(x,y)
   return math.abs(x-y) end
 
 -- Maps `x` 0..1 for lo..hi.
-function NUM:norm(x) 
-  return x=="?" and x or (x - self.lo)/(self.hi - self.lo + 1E-30) end
+function NUM:norm(x) return x=="?" and x or (x - self.lo)/(self.hi - self.lo + 1E-30) end
 -------------------------------------------------------------------------------
 -- ## SYM
 
@@ -65,11 +68,13 @@ local SYM = {}
 function SYM.new(s, n)
   return l.isa(SYM, {n=0, txt=s, at=n, has={}}) end
 
+-- Update.
 function SYM:add(x)
   if x~="?" then
     self.n = self.n + 1
     self.has[x] = (self.has[x] or 0) + 1 end end
 
+-- Merge two SYMs
 function SYM.merge(i,j,      new)
   new = SYM.new(i.txt, i.at)
   new.n = i.n + j.n
@@ -78,13 +83,12 @@ function SYM.merge(i,j,      new)
       new.has[k] = (new.has[k] or 0) + v end end
   return new end
 
-function SYM:mid(    n,mode)
-  n=0; for k,v in pairs(self.has) do if v>n then mode,n=v,n end end; return mode end
+-- Stats
+function SYM:mid() return l.model(self.has) end
+function SYM:div() return l.entropy(self.has) end
+function SYM:like(x,m,prior) return ((self.has[x] or 0) + m*prior)/(self.n + m) end
 
-function SYM:div(     e)
-  e=0; for _,v in pairs(self.has) do e=e + v/self.n*math.log(v/self.n,2) end
-  return -e end
-
+-- Distance.
 function SYM:dist(x,y)
   return x=="?" and y=="?" and 1 or (x==y and 0 or 1) end
 -------------------------------------------------------------------------------
@@ -107,7 +111,7 @@ function COLS:add(t)
     for _,col in pairs(cols) do
       col:add( t[col.at] ) end end 
   return t end
--------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 -- ## DATA
 
 -- Store `rows` and their `col`umn summaries.
@@ -126,6 +130,7 @@ function DATA:add(t)
   then l.push(self.rows, self.cols:add(t) )
   else self.cols = COLS.new(t) end end
 
+-- Sort rows by distance to heaven.
 function DATA:sort()
   self.rows = l.keysort(self.rows, function(row) return self:d2h(row) end)
   return self.rows end
@@ -148,10 +153,23 @@ function DATA:clone(  t,order,        d)
   if order then d:sort() end
   return d end
 
--- Stats
+-- Stats.
 function DATA:mid(  cols,ndecs,    u) 
   u={}; for _,col in pairs(cols or self.cols.y) do 
           u[1+#u]= l.rnd(col:mid(),ndecs) end; return u end
+
+-- Log likelihood
+function DATA:loglike(t,n,nHypotheses,       prior,out,x,inc)
+  print(the.k, the.m)
+  prior = (#self.rows + the.k) / (n + the.k * nHypotheses)
+  out   = math.log(prior)
+  for _,col in pairs(self.cols.x) do
+    x = t[col.at]
+    if x ~= "?" then
+      inc = col:like(x,the.m,prior)
+      print(">",x,inc)
+      out = out + math.log(  inc) end end
+  return out end
 
 -- Distance between two rows.
 function DATA:dist(t1,t2,      n,d)
@@ -198,12 +216,13 @@ function DATA:halves(rows,order,     node,ps,qs,stop)
   rows = rows or self.rows 
   node = {here=self:clone(rows,true)}
   stop = (#self.rows)^the.leaf
-  if #rows > stop
+  if #rows > 1.5*stop
   then  ps,qs = self:halve(rows, order)
         node.lefts  = #ps < #rows and self:halves(ps, order) 
         node.rights = #qs < #rows and self:halves(qs, order) end
   return node end
 
+-- Iterator. Call `fun` on all nodes.
 function DATA:visit(node,fun,      lvl)
   lvl = lvl or 0
   if node then
@@ -211,12 +230,12 @@ function DATA:visit(node,fun,      lvl)
     for _,kid in pairs{node.lefts, node.rights} do
       self:visit(kid, fun, lvl+1) end end end
 
+-- Visit function for the tree iterator. 
 function DATA:show(it,lvl,      right,left)
-  right = (it.lefts or it.rights) and "" or " : "..l.o(it.here.rows[1])  --mid())
+  right = (it.lefts or it.rights) and "" or " : "..l.o(it.here:mid())
   left  = ('|.. '):rep(lvl)..#(it.here.rows)
   print(string.format("%-" .. the.lhs .. "s %s", left, right)) end 
-
--------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 -- ## Misc library functions
 -- ### Objects
 
@@ -264,7 +283,14 @@ function l.keysort(t,fun,      u,v)
   v={}; for _,xy in pairs(u) do v[1+#v] = xy.x end
   return v end
 
--- ### Maths
+-- Return most common key.
+function l.mode(t,    m,N)
+  N=0; for k,n in pairs(t) do if N>n then m,N=k,n end end; return m end
+
+-- Return entropy.
+function l.entropy(t,     N)
+  N=0; for _,n in pairs(t) do N = N + n end
+  e=0; for _,n in pairs(t) do e = e + n/N*math.log(n/N,2) end; return -e end
 
 -- Round something to `ndecs` or, if its an int, to no decimals.
 function l.rnd(n, ndecs,     mult)
@@ -272,6 +298,14 @@ function l.rnd(n, ndecs,     mult)
   if math.floor(n) == n  then return n end
   mult = 10^(ndecs or 2)
   return math.floor(n * mult + 0.5) / mult end
+
+-- CDF for triangular
+function l.cdfTriangular(x,lo,mid,hi)
+  if x <= lo  then return 0 end
+  if x >= hi  then return 0 end
+  if x <  mid then return 2*(x - lo) / ((hi - lo) * (mid - lo)) end
+  if x == mid then return 2 / (hi - lo) end
+  return 2*(hi - x) / ((hi - lo) * (hi - mid)) end
 
 -- ### String to Thing
 
@@ -313,7 +347,7 @@ function l.o(t,    u)
   for _,k in pairs(l.keys(t)) do
     u[1+#u] = #t>0 and tostring(t[k]) or string.format("%s:%s",k,t[k]) end
   return (t.a or "") .. "{" .. table.concat(#t>0 and u or l.sort(u), ", ") .. "}" end
--------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 -- ## Start-up Actions
 
 local eg={}
@@ -360,6 +394,10 @@ function eg.merge(       d,d1,d2,t1,t2,d3)
     l.oo(d.cols.all[i])
     l.oo(d3.cols.all[i]) end end
 
+function eg.like()
+  d     = DATA.new(l.csv(the.file))
+  for _,row in pairs(d.rows) do
+    print( d:loglike(row,1000,2) )   end end
 -----------------------------------------
 -- ## Start up. 
 
