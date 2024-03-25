@@ -31,11 +31,11 @@ function NUM.new(  s,n)
                      heaven= (s or ""):find"-$" and 0 or 1}) end
 
 -- Update
-function NUM:add(x,    d) 
+function NUM:add(x,    d)
   if x~="?" then
-    self.n  = self.n + 1 
+    self.n  = self.n + 1
     self.lo = math.min(x, self.lo)
-    self.hi = math.max(x, self.hi) 
+    self.hi = math.max(x, self.hi)
     d       = x - self.mu
     self.mu = self.mu + d/self.n end end
 
@@ -112,7 +112,7 @@ function COLS.new(t,     x,y,all,col,klass)
 function COLS:add(t)
   for _,cols in pairs{self.x, self.y} do
     for _,col in pairs(cols) do
-      col:add( t[col.at] ) end end 
+      col:add( t[col.at] ) end end
   return t end
 -------------------------------------------------------------------------------
 -- ## DATA
@@ -157,8 +157,8 @@ function DATA:clone(  t,order,        d)
   return d end
 
 -- Stats.
-function DATA:mid(  cols,ndecs,    u) 
-  u={}; for _,col in pairs(cols or self.cols.y) do 
+function DATA:mid(  cols,ndecs,    u)
+  u={}; for _,col in pairs(cols or self.cols.y) do
           u[1+#u]= l.rnd(col:mid(),ndecs) end; return u end
 
 -- Log likelihood
@@ -214,13 +214,13 @@ function DATA:halve(rows,  order,     p,q,ps,qs,c)
   return ps,qs end
 
 -- Recursively bi-cluster the data. 
-function DATA:halves(rows,order,     node,ps,qs,stop) 
+function DATA:halves(rows,order,     node,ps,qs,stop)
   rows = rows or self.rows 
   node = {here=self:clone(rows,true)}
   stop = (#self.rows)^the.leaf
   if #rows > 1.5*stop
   then  ps,qs = self:halve(rows, order)
-        node.lefts  = #ps < #rows and self:halves(ps, order) 
+        node.lefts  = #ps < #rows and self:halves(ps, order)
         node.rights = #qs < #rows and self:halves(qs, order) end
   return node end
 
@@ -236,15 +236,15 @@ function DATA:visit(node,fun,      lvl)
 function DATA:show(it,lvl,      right,left)
   right = (it.lefts or it.rights) and "" or " : "..l.o(it.here:mid())
   left  = ('|.. '):rep(lvl)..#(it.here.rows)
-  print(string.format("%-" .. the.lhs .. "s %s", left, right)) end 
+  print(string.format("%-" .. the.lhs .. "s %s", left, right)) end
 -------------------------------------------------------------------------------
 -- ## Misc library functions
 -- ### Objects
 
 -- Make classes.  
 function l.klassify(t)
-  for s,klass in pairs(t) do 
-     klass.a=s; klass.__index=klass 
+  for s,klass in pairs(t) do
+     klass.a=s; klass.__index=klass
      klass.__tostring=function(...) return l.o(...) end end end
 
 -- Make an instance. 
@@ -260,7 +260,7 @@ function l.any(t) return t[math.random(#t)] end
 
 -- Return any `n` items from `t`.
 function l.many(t,n,   u)
-  u={}; for i=1,n do u[1+#u] = l.any(t) end; return u end; 
+  u={}; for i=1,n do u[1+#u] = l.any(t) end; return u end;
 
 -- Return `t` skipping `go` to `stop` in steps of `inc`.
 function l.slice(t, go, stop, inc,    u)
@@ -292,9 +292,10 @@ function l.mode(t,    m,N)
   N=0; for k,n in pairs(t) do if N>n then m,N=k,n end end; return m end
 
 -- Return entropy.
-function l.entropy(t,     N)
+function l.entropy(t,     e,N)
   N=0; for _,n in pairs(t) do N = N + n end
-  e=0; for _,n in pairs(t) do e = e + n/N*math.log(n/N,2) end; return -e end
+  e=0; for _,n in pairs(t) do e = e + n/N*math.log(n/N,2) end;
+  return -e end
 
 -- Round something to `ndecs` or, if its an int, to no decimals.
 function l.rnd(n, ndecs,     mult)
@@ -319,7 +320,7 @@ function l.coerce(s)
 
 -- Convert help strings (like as seen above) to key:values of a table. 
 function l.options(t,s)
-  for k, s in s:gmatch("[-][-]([%S]+)[^=]+=[%s]+([%S]+)") do t[k] = l.coerce(s) end end
+  for k, s1 in s:gmatch("[-][-]([%S]+)[^=]+=[%s]+([%S]+)") do t[k] = l.coerce(s1) end end
 
 -- Iterator. Convert strings in a csv file as Lua tables, one table at a time. 
 function l.csv(src)
@@ -338,12 +339,12 @@ function l.cli(t)
     for n,s in pairs(arg) do
       if s=="-"..k:sub(1,1) then
         v = v=="true" and "false" or v=="false" and "true" or arg[n + 1]
-        t[k] = l.coerce(v) end end end 
+        t[k] = l.coerce(v) end end end
   if t.help then os.exit(print("\n"..help)) end end
 
 -- ### Thing to Strings
 
-function prints(t) print(l.o(t)); return t end
+function l.prints(t) print(l.o(t)); return t end
 
 -- Convert thing to string.
 function l.o(t,    u)
@@ -356,30 +357,30 @@ function l.o(t,    u)
 
 local eg={}
 
-function eg.the() prints(the) end
+function eg.the() l.prints(the) end
 
 function eg.seed() print(the.seed) end
 
 function eg.data(     d)
   d = DATA.new(l.csv(the.file))
-  prints(d:mid(d.cols.all,3)) end
+  l.prints(d:mid(d.cols.all,3)) end
 
 function eg.clone(     d)
    d = DATA.new(l.csv(the.file))
    d:clone(d.rows) end
 
-function eg.dists(    d,a,b,ab)
+function eg.dists(    d)
   d = DATA.new(l.csv(the.file))
   for _,row in pairs(d.rows) do io.write(l.rnd(d:dist(row, d.rows[1]),3)," ") end end
 
 function eg.neighbors(    d,rows)
   d = DATA.new(l.csv(the.file))
-  rows = d:neighbors(d.rows[1]) 
+  rows = d:neighbors(d.rows[1])
   print("id,",l.o(d.cols.names))
   for i=1,7     do print(i..",",l.o(rows[i])) end
   for i=373,380 do print(i..",",l.o(rows[i])) end end
 
-function eg.sort()
+function eg.sort(    d)
   d = DATA.new(l.csv(the.file),true)
   for i=1,#d.rows,25 do
     print(d.rows[i]) end end
@@ -398,7 +399,7 @@ function eg.merge(       d,d1,d2,t1,t2,d3)
     print(d.cols.all[i])
     print(d3.cols.all[i]) end end
 
-function eg.like()
+function eg.like(    d)
   d     = DATA.new(l.csv(the.file))
   for _,row in pairs(d.rows) do
     print( d:loglike(row,1000,2),l.o(row) )   end end
