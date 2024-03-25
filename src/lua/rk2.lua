@@ -198,7 +198,7 @@ function DATA:halves(rows,order,     node,ps,qs,stop)
   rows = rows or self.rows 
   node = {here=self:clone(rows)}
   stop = (#self.rows)^the.leaf
-  if #rows > 2*stop
+  if #rows > stop
   then  ps,qs = self:halve(rows, order)
         node.lefts  = #ps < #rows and self:halves(ps, order) 
         node.rights = #qs < #rows and self:halves(qs, order) end
@@ -265,6 +265,7 @@ function l.keysort(t,fun,      u,v)
   return v end
 
 -- ### Maths
+
 -- Round something to `ndecs` or, if its an int, to no decimals.
 function l.rnd(n, ndecs,     mult)
   if type(n) ~= "number" then return n end
