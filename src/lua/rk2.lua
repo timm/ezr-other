@@ -346,19 +346,18 @@ function eg.sort()
     l.oo(d.rows[i]) end end
 
 function eg.halves(       d, tree)
-  d= DATA.new(l.csv(the.file))
-  tree=d:halves(d.rows, true)
+  d    = DATA.new(l.csv(the.file))
+  tree = d:halves(d.rows, true)
   d:visit(tree,DATA.show) end
  
 function eg.merge(       d,d1,d2,t1,t2,d3)
-  d= DATA.new(l.csv(the.file))
+  d     = DATA.new(l.csv(the.file))
   t1,t2 = l.slice(d.rows,1,200), l.slice(d.rows,200)
   d1,d2 = d:clone(t1), d:clone(t2)
   d3    = d1:merge(d2)
   for i,_ in pairs(d.cols.all) do print""
     l.oo(d.cols.all[i])
-    l.oo(d3.cols.all[i])  end
-end
+    l.oo(d3.cols.all[i]) end end
 
 -----------------------------------------
 -- ## Start up. 
