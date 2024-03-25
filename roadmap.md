@@ -1,4 +1,17 @@
 # smarter
+## Why basic
+- https://world.hey.com/dhh/finding-the-last-editor-dae701cc
+- Doug McIlroy : We used to sit around in the Unix Room saying, 'What can we throw out? Why is there this option?' It's often because there is some deficiency in the basic design — you didn't really hit the right design point. Instead of adding an option, think about what was forcing you to add that option.
+- The more you code the more you have to maintain, upgrade, port to other systems.
+
+### Counter case
+- simplicity takes time (Bliase Pacal: 
+  <em>Je n'ai fait celle-ci plus longue que parce que je n'ai pas eu le loisir de la faire plus courte.</em>
+  I would have written a shorter letter, but I did not have the time.)
+- Complexity sells (or, more accurately, the maintaince income associated with complexity sells).
+- Complexity is attractive (lures in the unwary, locks them in with so many decisions they mever want to remake)
+- less is a bore
+- teaching package manager, codespaces, vscode. markmap
 
 ## The Basics
 

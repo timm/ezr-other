@@ -100,7 +100,7 @@ function SYM:dist(x,y)
 -- Factory to make column headers (from column names).
 local COLS = {}
 function COLS.new(t,     x,y,all,col,klass)
-  all,x,y = {},{},{} 
+  all,x,y = {},{},{}
   for n,s in pairs(t) do
     col = l.push(all, (s:find"^[A-Z]" and NUM or SYM).new(s,n))
     if not col.txt:find"X$" then
@@ -215,7 +215,7 @@ function DATA:halve(rows,  order,     p,q,ps,qs,c)
 
 -- Recursively bi-cluster the data. 
 function DATA:halves(rows,order,     node,ps,qs,stop)
-  rows = rows or self.rows 
+  rows = rows or self.rows
   node = {here=self:clone(rows,true)}
   stop = (#self.rows)^the.leaf
   if #rows > 1.5*stop
@@ -260,7 +260,7 @@ function l.any(t) return t[math.random(#t)] end
 
 -- Return any `n` items from `t`.
 function l.many(t,n,   u)
-  u={}; for i=1,n do u[1+#u] = l.any(t) end; return u end;
+  u={}; for _=1,n do u[1+#u] = l.any(t) end; return u end;
 
 -- Return `t` skipping `go` to `stop` in steps of `inc`.
 function l.slice(t, go, stop, inc,    u)
@@ -389,7 +389,7 @@ function eg.halves(       d, tree)
   d    = DATA.new(l.csv(the.file))
   tree = d:halves(d.rows, true)
   d:visit(tree,DATA.show) end
- 
+
 function eg.merge(       d,d1,d2,t1,t2,d3)
   d     = DATA.new(l.csv(the.file))
   t1,t2 = l.slice(d.rows,1,200), l.slice(d.rows,200)
