@@ -21,8 +21,9 @@ Options
 
 -- NUMs summarize a stream of numbers.
 local NUM = {}
-function NUM.new(s, n) 
-  return l.isa(NUM, {n=0, txt=s, at=n, mu=0, lo=1E30, hi=-1E30}) end
+function NUM.new(  s,n)
+  return l.isa(NUM, {n=0, txt=s, at=n, mu=0, lo=1E30, hi=-1E30,
+                     heaven= (s or ""):find"-$" and 0 or 1}) end
 
 -- update
 function NUM:add(x,    d) 
@@ -34,9 +35,9 @@ function NUM:add(x,    d)
     self.mu = self.mu + d/self.n end end
 
 function NUM.merge(i,j,    new)
-  new    = NUM(i.txt,i.s)
+  new    = NUM.new(i.txt,i.s)
   new.n  = i.n + j.n
-  new.mu = (i.n*i.mu + j.n*j.mu)/new.n
+  new.mu = (i.n*i.mu + j.n*j.mu) / (new.n + 1E-30)
   new.lo = math.min(i.lo, j.lo)
   new.hi = math.max(i.hi, j.hi)
   return new end
@@ -70,7 +71,7 @@ function SYM:add(x)
     self.has[x] = (self.has[x] or 0) + 1 end end
 
 function SYM.merge(i,j,      new)
-  new = SYM(i.txt, i.at)
+  new = SYM.new(i.txt, i.at)
   new.n = i.n + j.n
   for _,has in pairs{i.has, j.has} do
     for k,v in pairs(has) do
@@ -95,9 +96,9 @@ function COLS.new(t,     x,y,all,col,klass)
   all,x,y = {},{},{} 
   for n,s in pairs(t) do
     col = l.push(all, (s:find"^[A-Z]" and NUM or SYM).new(s,n))
-    if not s:find"X$" then
-      l.push( s:find"[!+-]" and y or x, col)
-      if s:find"!$" then klass = col end end end
+    if not col.txt:find"X$" then
+      l.push(col.txt:find"[!+-]" and y or x, col)
+      if col.txt:find"!$" then klass = col end end end
   return l.isa(COLS, {names=t; all=all, x=x, y=y, klass=klass}) end
 
 -- Update
@@ -112,10 +113,11 @@ function COLS:add(t)
 -- DATA can be initialized from a csv file or a list of rows.
 
 local DATA = {}
-function DATA.new(src,    self)
+function DATA.new(src,order,    self)
   self = l.isa(DATA, {rows={}, cols=nil})
   if type(src)=="function" then for   t in src        do self:add(t) end end
   if type(src)=="table"    then for _,t in pairs(src) do self:add(t) end end
+  if order then self:sort() end
   return self end
 
 -- Update
@@ -124,16 +126,21 @@ function DATA:add(t)
   then l.push(self.rows, self.cols:add(t) )
   else self.cols = COLS.new(t) end end
 
+function DATA:sort()
+  self.rows = l.keysort(self.rows, function(row) return self:d2h(row) end)
+  return self.rows end
+
 -- Merge
 function DATA.merge(i,j,     new)
   new = i:clone{}
-  for n,col0 in pairs(new.cols.all) do 
+  for n,col0 in pairs(new.cols.all) do
     for k,v in pairs(i.cols.all[n]:merge(j.cols.all[n])) do
       col0[k] = v end end
   for _,rows in pairs{i.rows,j.rows} do
     for _,row in pairs(rows) do  
       l.push(new.rows, row) end end
   return new end
+
 
 -- Return another DATA with the same structure.
 function DATA:clone(  t,d)
@@ -146,7 +153,7 @@ function DATA:mid(  cols,ndecs,    u)
   u={}; for _,col in pairs(cols or self.cols.y) do 
           u[1+#u]= l.rnd(col:mid(),ndecs) end; return u end
 
--- Distance.
+-- Distance between two rows.
 function DATA:dist(t1,t2,      n,d)
   n,d = 0,0
   for _,col in pairs(self.cols.x) do
@@ -154,36 +161,47 @@ function DATA:dist(t1,t2,      n,d)
     d = d + col:dist(t1[col.at], t2[col.at])^the.p end
   return (d/n)^(1/the.p) end
 
+-- Distance from a row to a best values for all `y` goals.
+function DATA:d2h(t,     n,d)
+  n,d = 0,0
+  for _,col in pairs(self.cols.y) do
+    n = n + 1
+    d = d + math.abs(col:norm(t[col.at]) - col.heaven)^2 end
+  return (d/n)^(1/2) end
+
+-- Sort everything in `rows` (defaults to `self.rows`) by distance to `row1`.
 function DATA:neighbors(row1,  rows)
   return l.keysort(rows or self.rows,
                    function(row2) return self:dist(row1,row2) end) end
 
 -- Returns two distance points.
-function DATA:polarize(rows,      east,west,far)
+function DATA:polarize(rows,      p,q,far)
   rows = rows or self.rows
-  far = (#rows * the.Far)//1
-  east = self:neighbors(l.any(rows),rows)[far]
-  west = self:neighbors(east,rows)[far]
-  return east,west,self:dist(east,west) end
+  far  = (#rows * the.Far)//1
+  p    = self:neighbors(l.any(rows),rows)[far]
+  q    = self:neighbors(p,rows)[far]
+  return p,q,self:dist(p,q) end
 
 -- Divides rows by distance to two distant points. Return biggest division first.
-function DATA:halve(rows,      east,_,easts,wests,c)
-  east, _,c = self:polarize(l.many(rows, the.Halves))
-  easts,wests = {},{}
+function DATA:halve(rows,  order,     p,q,ps,qs,c)
+  p,q,c = self:polarize(l.many(rows, the.Halves))
+  ps,qs = {},{}
   for _,t in pairs(rows) do
-    l.push(self:dist(t,east) <= c/2 and easts or wests, t) end
-  if #easts < #wests then easts,wests = wests,easts end
-  return easts, wests   end
+    l.push(self:dist(t,p) <= c/2 and ps or qs, t) end
+  if order
+  then if self:d2h(q) < self:d2h(p) then ps,qs,p,q = qs,ps,q,p end
+  else if #ps < #qs                 then ps,qs,p,q = qs,ps,q,p end end
+  return ps,qs end
 
 -- Recursively bi-cluster the data. 
-function DATA:halves(rows,lvl,     node,lefts,rights)
-  lvl = lvl or 0
-  rows  = rows or self.rows 
+function DATA:halves(rows,order,     node,ps,qs,stop) 
+  rows = rows or self.rows 
   node = {here=self:clone(rows)}
-  if    #rows > 2*(#self.rows)^the.leaf
-  then  lefts,rights = self:halve(rows)
-        node.lefts  = #lefts  < #rows and self:halves(lefts,lvl+1)
-        node.rights = #rights < #rows and self:halves(rights,lvl+1) end
+  stop = (#self.rows)^the.leaf
+  if #rows > 2*stop
+  then  ps,qs = self:halve(rows, order)
+        node.lefts  = #ps < #rows and self:halves(ps, order) 
+        node.rights = #qs < #rows and self:halves(qs, order) end
   return node end
 
 function DATA:visit(node,fun,      lvl)
@@ -220,6 +238,14 @@ function l.any(t) return t[math.random(#t)] end
 -- Return any `n` items from `t`.
 function l.many(t,n,   u)
   u={}; for i=1,n do u[1+#u] = l.any(t) end; return u end; 
+
+-- Return `t` skipping `go` to `stop` in steps of `inc`.
+function l.slice(t, go, stop, inc,    u)
+  if go   and go   < 0 then go=#t+go     end
+  if stop and stop < 0 then stop=#t+stop end
+  u={}
+  for j=(go or 1)//1,(stop or #t)//1,(inc or 1)//1 do u[1+#u]=t[j] end
+  return u end
 
 -- ### Sorting 
 
@@ -307,17 +333,33 @@ function eg.dists(    d,a,b,ab)
   d = DATA.new(l.csv(the.file))
   for _,row in pairs(d.rows) do io.write(l.rnd(d:dist(row, d.rows[1]),3)," ") end end
 
-function eg.sort(    d,rows)
+function eg.neighbors(    d,rows)
   d = DATA.new(l.csv(the.file))
   rows = d:neighbors(d.rows[1]) 
   print("id,",l.o(d.cols.names))
-  for i=1,10    do print(i..",",l.o(rows[i])) end
-  for i=370,380 do print(i..",",l.o(rows[i])) end end
+  for i=1,7     do print(i..",",l.o(rows[i])) end
+  for i=373,380 do print(i..",",l.o(rows[i])) end end
+
+function eg.sort()
+  d = DATA.new(l.csv(the.file),true)
+  for i=1,#d.rows,25 do
+    l.oo(d.rows[i]) end end
 
 function eg.halves(       d, tree)
   d= DATA.new(l.csv(the.file))
-  tree=d:halves()
+  tree=d:halves(d.rows, true)
   d:visit(tree,DATA.show) end
+ 
+function eg.merge(       d,d1,d2,t1,t2,d3)
+  d= DATA.new(l.csv(the.file))
+  t1,t2 = l.slice(d.rows,1,200), l.slice(d.rows,200)
+  d1,d2 = d:clone(t1), d:clone(t2)
+  d3    = d1:merge(d2)
+  for i,_ in pairs(d.cols.all) do print""
+    l.oo(d.cols.all[i])
+    l.oo(d3.cols.all[i])  end
+end
+
 -----------------------------------------
 -- ## Start up. 
 
