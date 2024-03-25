@@ -8,7 +8,7 @@ thing.lua
 Options
   -f --file     data file                        = ../../data/auto93.csv
   -F --Far      if polarizing, ignore  outliners = 0.95
-  -H --Halves   if polarizing, use a subset      = 64
+  -H --Halves   if polarizing, use a subset      = 128
   -l --leaf     when recursing, stop at n^leaf   = 0.5
   -L --lhs      tree print left hand side        = 35
   -p --p        distance coeffecient             = 2 
@@ -59,8 +59,8 @@ function NUM:norm(x)
   return x=="?" and x or (x - self.lo)/(self.hi - self.lo + 1E-30) end
 -------------------------------------------------------------------------------
 -- ## SYM
--- SYMs summarize a stream of symbols
 
+-- SYMs summarize a stream of symbols
 local SYM = {}
 function SYM.new(s, n)
   return l.isa(SYM, {n=0, txt=s, at=n, has={}}) end
@@ -89,8 +89,8 @@ function SYM:dist(x,y)
   return x=="?" and y=="?" and 1 or (x==y and 0 or 1) end
 -------------------------------------------------------------------------------
 -- ## COLS
--- Factory to make column headers (from column names).
 
+-- Factory to make column headers (from column names).
 local COLS = {}
 function COLS.new(t,     x,y,all,col,klass)
   all,x,y = {},{},{} 
@@ -109,9 +109,9 @@ function COLS:add(t)
   return t end
 -------------------------------------------------------------------------------
 -- ## DATA
+
 -- Store `rows` and their `col`umn summaries.
 -- DATA can be initialized from a csv file or a list of rows.
-
 local DATA = {}
 function DATA.new(src,order,    self)
   self = l.isa(DATA, {rows={}, cols=nil})
@@ -137,15 +137,15 @@ function DATA.merge(i,j,     new)
     for k,v in pairs(i.cols.all[n]:merge(j.cols.all[n])) do
       col0[k] = v end end
   for _,rows in pairs{i.rows,j.rows} do
-    for _,row in pairs(rows) do  
+    for _,row in pairs(rows) do
       l.push(new.rows, row) end end
   return new end
 
-
 -- Return another DATA with the same structure.
-function DATA:clone(  t,d)
+function DATA:clone(  t,order,        d)
   d = DATA.new({self.cols.names})
   for _,t1 in pairs(t or {}) do d:add(t1) end
+  if order then d:sort() end
   return d end
 
 -- Stats
@@ -196,7 +196,7 @@ function DATA:halve(rows,  order,     p,q,ps,qs,c)
 -- Recursively bi-cluster the data. 
 function DATA:halves(rows,order,     node,ps,qs,stop) 
   rows = rows or self.rows 
-  node = {here=self:clone(rows)}
+  node = {here=self:clone(rows,true)}
   stop = (#self.rows)^the.leaf
   if #rows > stop
   then  ps,qs = self:halve(rows, order)
@@ -212,7 +212,7 @@ function DATA:visit(node,fun,      lvl)
       self:visit(kid, fun, lvl+1) end end end
 
 function DATA:show(it,lvl,      right,left)
-  right = (it.lefts or it.rights) and "" or " : "..l.o(it.here:mid())
+  right = (it.lefts or it.rights) and "" or " : "..l.o(it.here.rows[1])  --mid())
   left  = ('|.. '):rep(lvl)..#(it.here.rows)
   print(string.format("%-" .. the.lhs .. "s %s", left, right)) end 
 
