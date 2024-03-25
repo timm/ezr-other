@@ -2,13 +2,16 @@
 
 local l,the = {},{}-- place for  (a) library functions and (b) settings
 local help = [[
-thing.lua
-(c)2024 Tim Menzies
+2ez.lua: sequential model optimizer.  Clump the data, sort any 2
+clumps into best/rest; build a model that reports likelihood b,r
+of being in best,rest; add to best/rest clumps with most/least
+b/r; repeat.  (c) 2024 Tim Menzies, <timm@ieee.org> BSD-2clause license
 
 Options
   -f --file     data file                        = ../../data/auto93.csv
-  -F --Far      if polarizing, ignore  outliners = 0.95
-  -H --Halves   if polarizing, use a subset      = 128
+  -F --Far      if polarizing, ignore outliers   = 0.95
+  -h --help     show help                        = false
+  -H --Halves   if polarizing, use a subset      = 64
   -k --k        bayes                            = 2
   -l --leaf     when recursing, stop at n^leaf   = 0.5
   -L --lhs      tree print left hand side        = 35
@@ -84,7 +87,7 @@ function SYM.merge(i,j,      new)
   return new end
 
 -- Stats
-function SYM:mid() return l.model(self.has) end
+function SYM:mid() return l.mode(self.has) end
 function SYM:div() return l.entropy(self.has) end
 function SYM:like(x,m,prior) return ((self.has[x] or 0) + m*prior)/(self.n + m) end
 
@@ -160,15 +163,14 @@ function DATA:mid(  cols,ndecs,    u)
 
 -- Log likelihood
 function DATA:loglike(t,n,nHypotheses,       prior,out,x,inc)
-  print(the.k, the.m)
   prior = (#self.rows + the.k) / (n + the.k * nHypotheses)
   out   = math.log(prior)
   for _,col in pairs(self.cols.x) do
     x = t[col.at]
     if x ~= "?" then
       inc = col:like(x,the.m,prior)
-      print(">",x,inc)
-      out = out + math.log(  inc) end end
+      if inc > 0 then
+        out = out + math.log(  inc ) end end end
   return out end
 
 -- Distance between two rows.
@@ -241,7 +243,9 @@ function DATA:show(it,lvl,      right,left)
 
 -- Make classes.  
 function l.klassify(t)
-  for s,klass in pairs(t) do klass.a=s; klass.__index=klass end end
+  for s,klass in pairs(t) do 
+     klass.a=s; klass.__index=klass 
+     klass.__tostring=function(...) return l.o(...) end end end
 
 -- Make an instance. 
 function l.isa(x,y) return setmetatable(y,x) end
@@ -334,12 +338,12 @@ function l.cli(t)
     for n,s in pairs(arg) do
       if s=="-"..k:sub(1,1) then
         v = v=="true" and "false" or v=="false" and "true" or arg[n + 1]
-        t[k] = l.coerce(v) end end end end
+        t[k] = l.coerce(v) end end end 
+  if t.help then os.exit(print("\n"..help)) end end
 
 -- ### Thing to Strings
 
--- Convert thing to string and print it.
-function l.oo(t) print(l.o(t)) end
+function prints(t) print(l.o(t)); return t end
 
 -- Convert thing to string.
 function l.o(t,    u)
@@ -352,13 +356,13 @@ function l.o(t,    u)
 
 local eg={}
 
-function eg.the() l.oo(the) end
+function eg.the() prints(the) end
 
 function eg.seed() print(the.seed) end
 
 function eg.data(     d)
   d = DATA.new(l.csv(the.file))
-  l.oo(d:mid(d.cols.all,3)) end
+  prints(d:mid(d.cols.all,3)) end
 
 function eg.clone(     d)
    d = DATA.new(l.csv(the.file))
@@ -378,7 +382,7 @@ function eg.neighbors(    d,rows)
 function eg.sort()
   d = DATA.new(l.csv(the.file),true)
   for i=1,#d.rows,25 do
-    l.oo(d.rows[i]) end end
+    print(d.rows[i]) end end
 
 function eg.halves(       d, tree)
   d    = DATA.new(l.csv(the.file))
@@ -391,13 +395,14 @@ function eg.merge(       d,d1,d2,t1,t2,d3)
   d1,d2 = d:clone(t1), d:clone(t2)
   d3    = d1:merge(d2)
   for i,_ in pairs(d.cols.all) do print""
-    l.oo(d.cols.all[i])
-    l.oo(d3.cols.all[i]) end end
+    print(d.cols.all[i])
+    print(d3.cols.all[i]) end end
 
 function eg.like()
   d     = DATA.new(l.csv(the.file))
   for _,row in pairs(d.rows) do
-    print( d:loglike(row,1000,2) )   end end
+    print( d:loglike(row,1000,2),l.o(row) )   end end
+
 -----------------------------------------
 -- ## Start up. 
 
