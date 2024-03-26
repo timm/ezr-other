@@ -121,7 +121,7 @@ function COLS:add(t)
 local DATA = {}
 function DATA.new(fun,order,    self)
   self = l.isa(DATA, {rows={}, cols=nil})
-  for t in fun do self:add(t) end end
+  for t in fun do self:add(t) end 
   if order then self:sort() end
   return self end
 
