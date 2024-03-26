@@ -212,14 +212,15 @@ function DATA:halve(rows,  order,     p,q,ps,qs,c)
   return ps,qs end
 
 -- Recursively bi-cluster the data. 
-function DATA:halves(rows,order,     node,ps,qs,stop)
-  rows = rows or self.rows
-  node = {here=self:clone(rows,true)}
-  stop = (#self.rows)^the.leaf
-  if #rows > 1.5*stop
+function DATA:halves(rows,order,  above,    node,ps,qs,stop)
+  rows  = rows or self.rows
+  node  = {here=self:clone(rows)}
+  above = above or 1E30
+  stop  = (#self.rows)^the.leaf
+  if #rows > 2*stop and #rows < above
   then  ps,qs = self:halve(rows, order)
-        node.lefts  = #ps < #rows and self:halves(ps, order)
-        node.rights = #qs < #rows and self:halves(qs, order) end
+        node.lefts  = self:halves(ps, order, #rows)
+        node.rights = self:halves(qs, order, #rows) end
   return node end
 
 -- Iterator. Call `fun` on all nodes.
@@ -231,10 +232,10 @@ function DATA:visit(node,fun,      lvl)
       self:visit(kid, fun, lvl+1) end end end
 
 -- Visit function for the tree iterator. 
-function DATA:show(it,lvl,      right,left)
-  right = (it.lefts or it.rights) and "" or " : "..l.o(it.here:mid())
-  left  = ('|.. '):rep(lvl)..#(it.here.rows)
-  print(string.format("%-" .. the.lhs .. "s %s", left, right)) end
+function DATA:show(it,lvl,      s1,s2)
+  s1 = (it.lefts or it.rights) and "" or " : "..l.o(it.here:mid())
+  s2 = ('|.. '):rep(lvl)..#(it.here.rows)
+  print(string.format("%-" .. the.lhs .. "s %s", s2, s1)) end
 -------------------------------------------------------------------------------
 -- ## Misc library functions
 -- ### Objects
@@ -308,7 +309,7 @@ function l.rnd(n, ndecs,     mult)
   return math.floor(n * mult + 0.5) / mult end
 
 -- CDF for triangular
-function l.cdfTriangular(x,lo,mid,hi)
+function l.trigCdf(x,lo,mid,hi)
   if x <= lo  then return 0 end
   if x >= hi  then return 0 end
   if x <  mid then return 2*(x - lo) / ((hi - lo) * (mid - lo)) end
@@ -365,7 +366,8 @@ function eg.the() l.prints(the) end
 function eg.seed() print(the.seed) end
 
 function eg.trig()
-  for i=1,8 do print(i,("** "):rep(20*(l.cdfTriangular(i,1,3,8))//1))end end
+  for i=1,8 do 
+    print(i,("** "):rep(20*(l.trigCdf(i,1,3,8))//1)) end end
 
 function eg.data(     d)
   d = DATA.new(l.csv(the.file))
@@ -391,7 +393,7 @@ function eg.sort(    d)
   for i=1,#d.rows,25 do
     print(d.rows[i]) end end
 
-function eg.halves(       d, tree)
+function eg.halves(       d, tree,right,left)
   d    = DATA.new(l.csv(the.file))
   tree = d:halves(d.rows, true)
   d:visit(tree,DATA.show) end
