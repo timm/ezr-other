@@ -1,5 +1,4 @@
 #!/usr/bin/env lua
-
 local l,the = {},{}-- place for  (a) library functions and (b) settings
 local help = [[
 2ez.lua: sequential model optimizer.  Clump the data, sort any 2
@@ -120,10 +119,9 @@ function COLS:add(t)
 -- Store `rows` and their `col`umn summaries.
 -- DATA can be initialized from a csv file or a list of rows.
 local DATA = {}
-function DATA.new(src,order,    self)
+function DATA.new(fun,order,    self)
   self = l.isa(DATA, {rows={}, cols=nil})
-  if type(src)=="function" then for   t in src        do self:add(t) end end
-  if type(src)=="table"    then for _,t in pairs(src) do self:add(t) end end
+  for t in fun do self:add(t) end end
   if order then self:sort() end
   return self end
 
@@ -151,7 +149,7 @@ function DATA.merge(i,j,     new)
 
 -- Return another DATA with the same structure.
 function DATA:clone(  t,order,        d)
-  d = DATA.new({self.cols.names})
+  d = DATA.new(l.items({self.cols.names}))
   for _,t1 in pairs(t or {}) do d:add(t1) end
   if order then d:sort() end
   return d end
@@ -270,6 +268,11 @@ function l.slice(t, go, stop, inc,    u)
   for j=(go or 1)//1,(stop or #t)//1,(inc or 1)//1 do u[1+#u]=t[j] end
   return u end
 
+-- Return an interator that returns items.
+function l.items(t,    i,n)
+  i,n = 0,#t
+  return function () i=i+1; if i <= n then return t[i] end end end
+
 -- ### Sorting 
 
 -- Return `t` after sorting it according to `fun`.
@@ -360,6 +363,9 @@ local eg={}
 function eg.the() l.prints(the) end
 
 function eg.seed() print(the.seed) end
+
+function eg.trig()
+  for i=1,8 do print(i,("** "):rep(20*(l.cdfTriangular(i,1,3,8))//1))end end
 
 function eg.data(     d)
   d = DATA.new(l.csv(the.file))
