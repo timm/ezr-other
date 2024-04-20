@@ -1,14 +1,5 @@
 # smarter
 
-- 5 lines (ish) per method
-- 100 chars wide
-- no OO
-- constructors in UPPER CASE (constructors define types)
-  - use type names in var names for functions
-  - optional (2 spaces)
-  - local (4 sspaces)
-- page length chunks (or less)
-
 - are you meek? (writing intro examples)?
 - are you mighty (writing research papers, comparing this stuff to SOTA). 
   - before you can be mighty you have to be meek
@@ -23,6 +14,32 @@
 - team or solo? either is fine
 
 - lua or python?
+
+- 5 lines (ish) per method
+- 100 chars wide
+- no OO
+- constructors in UPPER CASE (constructors define types)
+  - use type names in var names for functions
+  - optional (2 spaces)
+  - local (4 sspaces)
+- page length chunks (or less)
+
+-standards
+ - no globals
+ - help
+ - settings
+ - constructors
+ - code
+ - misc functions (towards end)
+ - egs at end
+ - check for main, otherwise call an eg from the command line
+ - eg
+   - set up: reset random number seed and settings to defaults
+   - tear down: ditto. and return false is something crashes
+   - eg.all counts how many return false, returns that number to the operating system
+
+- md standards
+  - consoder not changing para1. auto copied from /README.md
 
 ## Exercises
 
