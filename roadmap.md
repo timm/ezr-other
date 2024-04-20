@@ -1,4 +1,36 @@
 # smarter
+
+- 5 lines (ish) per method
+- 100 chars wide
+- no OO
+- constructors in UPPER CASE (constructors define types)
+  - use type names in var names for functions
+  - optional (2 spaces)
+  - local (4 sspaces)
+- page length chunks (or less)
+
+- are you meek? (writing intro examples)?
+- are you mighty (writing research papers, comparing this stuff to SOTA). 
+  - before you can be mighty you have to be meek
+
+- are you writing for systems, shell, script, smarts, or story
+  - systems: install, standards (contribute.md), packaging, deep background
+  - shell: make, command line
+  - script: coding ninja stuff
+  - smarts: AI level stuff
+  - story: documentation
+
+- team or solo? either is fine
+
+- lua or python?
+
+## Exercises
+
+- Data
+- nearest neighbor and random HPO (30 random)
+- naive bayes and  SMO HPO
+- and directed HPO
+
 ## Why basic
 - https://world.hey.com/dhh/finding-the-last-editor-dae701cc
 - Doug McIlroy : We used to sit around in the Unix Room saying, 'What can we throw out? Why is there this option?' It's often because there is some deficiency in the basic design — you didn't really hit the right design point. Instead of adding an option, think about what was forcing you to add that option.
@@ -13,6 +45,7 @@
 - less is a bore
 - teaching package manager, codespaces, vscode. markmap
 
+
 ## The Basics
 
 ### Python
@@ -20,7 +53,7 @@
 - Sequences
   - sets
     - Removing duplicates
-    - disjunction
+    - [disjunction](#stats)
     - Conjunction
   - Slicing
   - Dictionary: and, or
@@ -41,7 +74,7 @@
 - lambda (closures)
 - toto: complete this from ase24/docs/ninjas
 
-### Just enough statistics
+### stats
 
 - normal
   - incremental update
