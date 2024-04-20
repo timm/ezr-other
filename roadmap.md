@@ -13,6 +13,30 @@
 
 - team or solo? either is fine
 
+- use fewer labels.
+
+Separate mechanisms from policy (write a DSL for policy)
+Small is beautiful: Write simple programs
+Write small programs
+Write transparent programs
+Avoid unnecessary output
+
+Make each program/function do one thing well.
+Build a prototype as soon as possible.
+Choose portability over efficiency.
+Store data in flat text files.
+Use shell scripts to increase leverage and portability.
+(\*) Make every program a filter. we';l be internal
+"worse is better":  simplicity of interface and/or implementation more important than (e.g.)
+     correctness, consistency, and completeness
+
+
+set seed once, run 20 repeats. compare distributions, not points
+not 0.4356172 but 44
+44 is (probably) not greater than 42
+bunching; i.e., a large number of treatments can be grouped into a small number of effectively similar units.
+blurring: many/all treatments  statistically indistinguishable.
+
 - lua or python?
 
 - 5 lines (ish) per method
@@ -37,6 +61,8 @@
    - set up: reset random number seed and settings to defaults
    - tear down: ditto. and return false is something crashes
    - eg.all counts how many return false, returns that number to the operating system
+
+- issue how we manage nested help and egs.... lets not solve that till we get enough experience
 
 - md standards
   - consoder not changing para1. auto copied from /README.md
