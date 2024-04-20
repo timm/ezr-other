@@ -15,6 +15,7 @@
 
 - use fewer labels.
 
+- not writing code, writing demos
 Separate mechanisms from policy (write a DSL for policy)
 Small is beautiful: Write simple programs
 Write small programs
