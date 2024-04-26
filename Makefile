@@ -1,5 +1,10 @@
 SHELL     := bash 
 MAKEFLAGS += --warn-undefined-variables
+EZR        = $(shell git rev-parse --show-toplevel)
+
+fred:
+	echo $(EZR)
+
 .SILENT: 
 
 help          :  ## show help
@@ -32,7 +37,7 @@ name:
 			--pro=color                       \
 			--columns  3                       \
 			-M letter                           \
-			--pretty-print="../etc/lua.ssh"   \
+			--pretty-print="$(EZR)/etc/lua.ssh"   \
 			-o ~/tmp/$^.ps $^ ;               \
 		ps2pdf ~/tmp/$^.ps $@ ;  rm ~/tmp/$^.ps; \
 	  open $@
