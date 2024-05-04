@@ -94,6 +94,7 @@ blurring: many/all treatments  statistically indistinguishable.
 
 ### Python
 
+- safe parsing
 - Sequences
   - sets
     - Removing duplicates
@@ -151,33 +152,40 @@ blurring: many/all treatments  statistically indistinguishable.
 ### scripting
 
 - script101
+  - technical debt
+    - less is more
   - documentation
-  - exposed control parameters
-  - test suite
+    - doc strings
+    - types
+    - badging
+  - configuration
+    - exposed control parameters
+  - testing
+    - test driven development
+    - test pattern test suite
+      - setup, reset, tear down
+      - $?
+    - static code analysis
+      - language server protocol
   - source control
     - config in source control. eg. my fav tmus start up
-  - piping
-    - shut the heck up (quiet execution)
-    - standard files STDIN, STDERR, STDOUT
+    - workflow
+      - pre-commit hooks
+        - e.g. badging
+  - decomposition
+    - piping
+      - shut the heck up (quiet execution)
+      - standard files STDIN, STDERR, STDOUT
   - seed control
 - automate everything (makefile: insert awkward stuff there)
-- test engine
-  - setup,
-    - reset
-  - tear down
-  - $?
-  - static code analysis (language server protocol)
-- documentation (docstrings)
-  - tuning
-- decomposition (pipes, stdio)
-- less is more (technical debt, my DATA model)
-- pre-commit hooks
-  - e.g. badging
 
 ## Easier AI
 
 - active learning (one thing per leaf)
 Data
+- clustering
+- nearest neighbor
+- kernels (linear, triangular)
 
 classifier:
 
