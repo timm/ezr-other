@@ -1,3 +1,52 @@
+# inference
+
+y=f(x)
+y1,y2,y3=f(x1,x2,x3,x4,x5,x6,...)
+
+preamble
+mid: central (middle) tendancy of a distribution (mean, median, mode)
+
+div: measure of diverstiy around the mid (entropy, standard deviation)
+
+regression, classification: |y|=1, y values are numeric, symbolic.
+
+multi-regression, multi-classification: |y|>1
+
+optimization: y values are numeric, each of which needs to be minimized or maximized
+
+association: some of y or x are missing and we need to fill them in
+
+distance: return the distance between two examples
+
+cluster: return sets of similar (X,Y) examples
+
+locate: given clusters, find which one is most similar to some new (X,Y)
+
+def PARTIAL\_MATCH(eg): apply distance, but only on some fields. return nearest items
+def ASSOCIATE(eg): cluster, locate, 
+
+def ASSOCIATE1(eg): cluster, locate(eg), find 
+ 
+def COMPRESS1(): cluster, then return just a few samples per cluster
+
+mutate: generate a new (X,Y) example 
+
+def MUTATE1(): add to example1 some point in-between example2 and example3
+
+synthesis: mutate some  (X,Y) examples to invent new ones
+
+def SYNTHESIS1(): run 
+
+
+an
+
+contrast: report the difference between to cluster
+
+
+def KNN1(): cluster
+
+
+
 # smarter
 
 - are you meek? (writing intro examples)?
