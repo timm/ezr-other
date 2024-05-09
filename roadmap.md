@@ -4,9 +4,11 @@ y=f(x)
 y1,y2,y3=f(x1,x2,x3,x4,x5,x6,...)
 
 preamble
-mid: central (middle) tendancy of a distribution (mean, median, mode)
+mid: central (middle) tendency   of a distribution (mean, median, mode)
 
-div: measure of diverstiy around the mid (entropy, standard deviation)
+div: measure of diversity around the mid (entropy, standard deviation)
+
+function SIMPLIFY()
 
 regression, classification: |y|=1, y values are numeric, symbolic.
 
