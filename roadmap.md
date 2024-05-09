@@ -1,5 +1,5 @@
 # inference
-
+every section needs definiton, tutorial , applciation (references), 
 
 preamble
 there are SYMs and there are NUMs
@@ -20,9 +20,14 @@ MUTATES1(A,B,C): [MUTATE1(A.x[i], B.x[i], C.x[i]) for i in #A]
 MUTATE1(a:NUM,b:NUM,c:NUM): a if rand() > cf else a + f*(b-c)
 MUTATE1(a:SYM,b:SYM,c:SYM): a if rand() > cf else (b if rand() > .5 else c)
 
+dist
+like
+
 y=f(x)
 y1,y2,y3=f(x1,x2,x3,x4,x5,x6,...)
 
+dists # change code
+likes # change code
 
 regression, classification: |y|=1, y values are numeric, symbolic.
 
