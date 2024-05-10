@@ -8,22 +8,22 @@ MID: central (middle) tendency   of a distribution (mean, median, mode)
 
 DIV: measure of diversity around the mid (entropy, standard deviation)
 
-def SIMPLER1(bin1,bin2):
-  both = bin1+bin2
-  n1,n2=len(bin1), len(bin2)
-  if DIV(both) <= (n1*DIV(bin1) + n2*DIV(bin2)) / (n1+n2): return both
+    def SIMPLER1(bin1,bin2):
+      both = bin1+bin2
+      n1,n2=len(bin1), len(bin2)
+      if DIV(both) <= (n1*DIV(bin1) + n2*DIV(bin2)) / (n1+n2): return both
 
-rand()=0..1
-seed = something. # reset me to regenerate same "random" numbers.
+    rand()=0..1
+    seed = something. # reset me to regenerate same "random" numbers.
 
-cf=.3,f=.5 (say)
-def MUTATES1(A,B,C): # to mutate A, pick B,C at random  
-  return [MUTATE1(A.x[i], B.x[i], C.x[i]) for i in #A]
+    cf=.3,f=.5 (say)
+    def MUTATES1(A,B,C): # to mutate A, pick B,C at random  
+      return [MUTATE1(A.x[i], B.x[i], C.x[i]) for i in #A]
 
-def MUTATE1(a,b,c): 
-  if rand() > cf: return a
-  if numeric(a): return a + f*(b-c)
-  return b if rand() > .5 else c
+    def MUTATE1(a,b,c): 
+      if rand() > cf: return a
+      if numeric(a): return a + f*(b-c)
+      return b if rand() > .5 else c
 
 dist
 like
