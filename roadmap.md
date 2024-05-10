@@ -2,23 +2,28 @@
 every section needs definiton, tutorial , applciation (references), 
 
 preamble
-there are SYMs and there are NUMs
+there are SYMs (=, !=) and there are NUMs (=,!=,+,-,*,/, etc)
+
 MID: central (middle) tendency   of a distribution (mean, median, mode)
 
 DIV: measure of diversity around the mid (entropy, standard deviation)
 
-SIMPLER1(bin1,bin2):
-   whole=bin1+bin2; if parts more complex than whole: return whole
-   #  DIV(whole)  <= (#bin1*DIV(bin1) + #bin2*DIV(bin2)) / (#bin1+#bin2)
+def SIMPLER1(bin1,bin2):
+  both = bin1+bin2
+  n1,n2=len(bin1), len(bin2)
+  if DIV(both) <= (n1*DIV(bin1) + n2*DIV(bin2)) / (n1+n2): return both
 
 rand()=0..1
-SEED = something. # reset me to regenerate same "random" numbers.
+seed = something. # reset me to regenerate same "random" numbers.
 
 cf=.3,f=.5 (say)
-MUTATES1(A,B,C): [MUTATE1(A.x[i], B.x[i], C.x[i]) for i in #A]
+def MUTATES1(A,B,C): # to mutate A, pick B,C at random  
+  return [MUTATE1(A.x[i], B.x[i], C.x[i]) for i in #A]
 
-MUTATE1(a:NUM,b:NUM,c:NUM): a if rand() > cf else a + f*(b-c)
-MUTATE1(a:SYM,b:SYM,c:SYM): a if rand() > cf else (b if rand() > .5 else c)
+def MUTATE1(a,b,c): 
+  if rand() > cf: return a
+  if numeric(a): return a + f*(b-c)
+  return b if rand() > .5 else c
 
 dist
 like
