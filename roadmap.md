@@ -1,5 +1,5 @@
 # inference
-every section needs definiton, tutorial , applciation (references), 
+every section needs definiton, tutorial , applciation (references), something about state of the art
 
 preamble
 there are SYMs (=, !=) and there are NUMs (=,!=,+,-,*,/, etc)
